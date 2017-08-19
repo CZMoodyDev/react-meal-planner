@@ -37,5 +37,5 @@ The assumption is you already have node installed on your computer.
 You might have to build the webpack before running the server. I'm newer to react/node, so here's how I do it with GIT Bash:
 1. Navigate to the folder containing the react-meal-planner project
 2. Right click on the folder, open in GIT Bash
-3. `$ NODE_ENV=production node_modules/.bin/babel-node --presets react,es2015 src/server.js`
-4. `$ NODE_EVN=production node_modules/.bin/webpack -p`
+3. `$ NODE_EVN=production node_modules/.bin/webpack -p`
+4. `$ NODE_ENV=production node_modules/.bin/babel-node --presets react,es2015 src/server.js`
