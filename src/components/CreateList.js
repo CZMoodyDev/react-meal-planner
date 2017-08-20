@@ -34,7 +34,6 @@ export default class CreateList extends React.Component {
                     this.setState({recipeLookup: newLookup});
                 }
                 
-                console.log(this.state.recipeLookup);
             }   
         });      
     }  
@@ -82,23 +81,40 @@ export default class CreateList extends React.Component {
             var li = [];
             var m_inst_list = [];
             
+            
             for (var i = 0; i < cartKeys.length; i++) {
                 //Meals Listing
                 var mealName = cartKeys[i];
                 var numMeals = cart[cartKeys[i]].count;
                 var liCont = mealName + " x" + numMeals;
+                var rec_ing = {};
                 li.push(<li>{liCont}</li>);
-             
+                var mealSeen = false;
+
                 //Add those meals to master_shopping_list
                 var recipeData = this.state.recipeLookup[cart[mealName]['rid'].toString()];
 
                 for (var j = 0; j < numMeals; j++) {
                     var rdIngredients = JSON.parse(recipeData['ingredients']);
+                                        
                     for (var k = 0; k < rdIngredients.length; k++) {
                         
                         var iName = rdIngredients[k]['iName'];
                         var unit = rdIngredients[k]['unit'];
                         var measure = rdIngredients[k]['measure'];
+                        
+                        if (!mealSeen) {
+                            if (!rec_ing.hasOwnProperty(iName)) {
+                                rec_ing[iName] = {};
+                            }
+                            
+                            if (!rec_ing[iName].hasOwnProperty(unit)) {
+                                rec_ing[iName][unit] = 0;
+                            }
+                            
+                            rec_ing[iName][unit] += parseFloat(measure);
+                            
+                        }                        
                         
                         if (!master_shopping_list.hasOwnProperty(iName)) {
                             master_shopping_list[iName] = {};
@@ -111,15 +127,33 @@ export default class CreateList extends React.Component {
                         master_shopping_list[iName][unit] += parseFloat(measure);
                         
                     }
+                    
+                    mealSeen = true;
                 }
 
                 //Instructions Listing
                 
                 var cookComp = recipeData['cook-inst'];
+                var single_ingredients = Object.keys(rec_ing);
+                var single_rec_ing = [];
                 
+                for (var a = 0; a < single_ingredients.length; a++) {
+                    var single_units = Object.keys(rec_ing[single_ingredients[a]]);
+                    var single_fullUnits = [];
+
+                    for (var b = 0; b < single_units.length; b++) {
+                        var single_fullMeasure = Math.round(rec_ing[single_ingredients[a]][single_units[b]] * 100) / 100;
+                        single_fullUnits.push(single_fullMeasure.toString() + single_units[b]);
+                    }
+
+                    var single_fullIngredient = single_ingredients[a] + ": " + single_fullUnits.join(" + ");
+                    single_rec_ing.push((<li>{single_fullIngredient}</li>));
+                }
+
                 inst_list = (
                     <div>
                         <h3>{recipeData.name}</h3>
+                        <ul>{single_rec_ing}</ul>
                         <p><strong>{recipeData['prep-inst']}</strong><br />{cookComp}<br /><i>{recipeData['serve-inst']}</i></p>
                     </div>
                 );
@@ -148,7 +182,6 @@ export default class CreateList extends React.Component {
             
             var compShop = (<ul>{shopLi}</ul>);
             
-            console.log(this.state);
         }
         
         
